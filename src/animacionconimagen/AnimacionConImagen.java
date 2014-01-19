@@ -45,8 +45,9 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
     private final int largo_elefante = 89;
     private final int altura_elefante = 73;
     private int direccion;              //1 = arriba; 2 = abajo; 3 = izquierda; 4 = derecha; 
-    private boolean cambio_imagen;
-    private int contador_colision;
+    private boolean cambio_imagen;      //Es true cuando tengo que cambiar la imagen en mi método de paint.
+    private int contador_colision;      //Contiene la cantidad de ciclos en pausa que tiene que estar la imagen al colisionar.
+    private boolean en_colision;        //Es true cuando estoy en colisión.
     private final int ciclos_de_espera_colision = 25; //contiene los ciclos de paint() que me voy a esperar al colisionar
 
     /**
@@ -62,6 +63,7 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
         direccion = 4;
         velocidad = 1;
         cambio_imagen = false;
+        en_colision = false;
         contador_colision = -1;
         addKeyListener(this);
     }
@@ -138,7 +140,7 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
         if (elefante != null) {
             //Dibuja la imagen en la posicion actualizada
             if (cambio_imagen) {
-                if (contador_colision == ciclos_de_espera_colision) {
+                if (en_colision) {
                     //cambio el objeto de elefante a su imagen de colision
                 } else {
                     if (direccion == 4) {
@@ -181,30 +183,17 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
         if (x_pos == (getWidth() - largo_elefante) || x_pos == 0
                 || y_pos == (getHeight() - altura_elefante) || y_pos == 0) {
             velocidad = 0;
-            if (contador_colision == -1) {
+            if (!en_colision) {
                 contador_colision = ciclos_de_espera_colision;
                 cambio_imagen = true;
+                en_colision = true;
             } else {
                 contador_colision--;
-                if (contador_colision == -1) {
+                if (contador_colision == 0) {
                     cambio_imagen = true;
-                    switch (direccion) {
-                        case 1:
-                            direccion = 2;
-                            break;
-                        case 2:
-                            direccion = 1;
-                            break;
-                        case 3:
-                            direccion = 4;
-                            break;
-                        case 4:
-                            direccion = 3;
-                            break;
-                    }
+                    en_colision = false; 
                     velocidad = 1;
-                } else {
-                    cambio_imagen = false;
+                    invertirDireccion();
                 }
             }
 
@@ -213,7 +202,7 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
 
     public void actualiza() {
         // Si no esta en colision, Se actualiza la posicion del elefante. 
-        if (contador_colision == -1) {
+        if (!en_colision) {
             switch (direccion) {
                 case 1:
                     y_pos -= velocidad;
@@ -286,4 +275,20 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
     public void keyReleased(KeyEvent e) {
     }
 
+    public void invertirDireccion() {
+        switch (direccion) {
+            case 1:
+                direccion = 2;
+                break;
+            case 2:
+                direccion = 1;
+                break;
+            case 3:
+                direccion = 4;
+                break;
+            case 4:
+                direccion = 3;
+                break;
+        }
+    }
 }
