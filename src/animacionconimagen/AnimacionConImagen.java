@@ -142,7 +142,7 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
             if (cambio_imagen) {
                 if (en_colision) {
                     //cambio el objeto de elefante a su imagen de colision
-                } else {
+                } else { 
                     if (direccion == 4) {
                         elefante = Toolkit.getDefaultToolkit().getImage(eURL_derecha);
                     } else {
