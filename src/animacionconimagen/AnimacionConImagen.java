@@ -40,12 +40,12 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
     private Image dbImage;
     private Graphics dbg;
 
-    private ImageIcon elefante;                 // Imagen del elefante
+    private Image elefante;                 // Imagen del elefante
     private final URL eURL_derecha = this.getClass().getResource("/Imagenes/elefante.gif");
     private final URL eURL_izquierda = this.getClass().getResource("/Imagenes/elefante-izquierda.gif");
-    private final URL eaURL = this.getClass().getResource("elephant.wav");
-    private int largo_elefante;
-    private int altura_elefante;
+    private final URL eaURL = this.getClass().getResource("/sonidos/elephant.wav");
+    private final int largo_elefante = 89;
+    private final int altura_elefante = 73;
     private int direccion;              //1 = arriba; 2 = abajo; 3 = izquierda; 4 = derecha; 
     private boolean cambio_imagen;      //Es true cuando tengo que cambiar la imagen en mi método de paint.
     private int contador_colision;      //Contiene la cantidad de ciclos en pausa que tiene que estar la imagen al colisionar.
@@ -62,19 +62,19 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
         x_pos = (int) (Math.random() * (getWidth() / 4));    // posicion en x es un cuarto del applet;
         y_pos = (int) (Math.random() * (getHeight() / 4));    // posicion en y es un cuarto del applet
 
-        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_derecha));
-        largo_elefante = elefante.getIconWidth();
-        altura_elefante = elefante.getIconHeight();
-        
+        elefante = Toolkit.getDefaultToolkit().getImage(eURL_derecha);
+//        largo_elefante = elefante.getIconWidth();
+//        altura_elefante = elefante.getIconHeight();
+
         sonido = getAudioClip(eaURL);
         setBackground(Color.yellow);
 
         direccion = 4;
         velocidad = 1;
-        cambio_imagen = false;
+        cambio_imagen = true;
         en_colision = false;
         contador_colision = -1;
-        
+
         addKeyListener(this);
     }
 
@@ -154,14 +154,14 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
                     //cambio el objeto de elefante a su imagen de colision
                 } else {
                     if (direccion == 4) {
-                        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_derecha));
+                        elefante = Toolkit.getDefaultToolkit().getImage(eURL_derecha);
                     } else {
-                        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_izquierda));
+                        elefante = Toolkit.getDefaultToolkit().getImage(eURL_izquierda);
                     }
                 }
                 cambio_imagen = false;
             }
-            g.drawImage(elefante.getImage(), x_pos, y_pos, this);
+            g.drawImage(elefante, x_pos, y_pos, this);
 
         } else {
             //Da un mensaje mientras se carga el dibujo	
