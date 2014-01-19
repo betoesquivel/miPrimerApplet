@@ -18,6 +18,7 @@ package animacionconimagen;
  * @version 1.00 2008/6/10
  */
 import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Color;
@@ -39,16 +40,18 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
     private Image dbImage;
     private Graphics dbg;
 
-    private Image elefante;                 // Imagen del elefante
+    private ImageIcon elefante;                 // Imagen del elefante
     private final URL eURL_derecha = this.getClass().getResource("/Imagenes/elefante.gif");
     private final URL eURL_izquierda = this.getClass().getResource("/Imagenes/elefante-izquierda.gif");
-    private final int largo_elefante = 89;
-    private final int altura_elefante = 73;
+    private final URL eaURL = this.getClass().getResource("elephant.wav");
+    private int largo_elefante;
+    private int altura_elefante;
     private int direccion;              //1 = arriba; 2 = abajo; 3 = izquierda; 4 = derecha; 
     private boolean cambio_imagen;      //Es true cuando tengo que cambiar la imagen en mi método de paint.
     private int contador_colision;      //Contiene la cantidad de ciclos en pausa que tiene que estar la imagen al colisionar.
     private boolean en_colision;        //Es true cuando estoy en colisión.
     private final int ciclos_de_espera_colision = 25; //contiene los ciclos de paint() que me voy a esperar al colisionar
+    private AudioClip sonido;
 
     /**
      * Metodo <I>init</I> sobrescrito de la clase <code>Applet</code>.<P>
@@ -58,13 +61,20 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
     public void init() {
         x_pos = (int) (Math.random() * (getWidth() / 4));    // posicion en x es un cuarto del applet;
         y_pos = (int) (Math.random() * (getHeight() / 4));    // posicion en y es un cuarto del applet
-        elefante = Toolkit.getDefaultToolkit().getImage(eURL_derecha);
+
+        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_derecha));
+        largo_elefante = elefante.getIconWidth();
+        altura_elefante = elefante.getIconHeight();
+        
+        sonido = getAudioClip(eaURL);
         setBackground(Color.yellow);
+
         direccion = 4;
         velocidad = 1;
         cambio_imagen = false;
         en_colision = false;
         contador_colision = -1;
+        
         addKeyListener(this);
     }
 
@@ -142,16 +152,16 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
             if (cambio_imagen) {
                 if (en_colision) {
                     //cambio el objeto de elefante a su imagen de colision
-                } else { 
+                } else {
                     if (direccion == 4) {
-                        elefante = Toolkit.getDefaultToolkit().getImage(eURL_derecha);
+                        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_derecha));
                     } else {
-                        elefante = Toolkit.getDefaultToolkit().getImage(eURL_izquierda);
+                        elefante = new ImageIcon(Toolkit.getDefaultToolkit().getImage(eURL_izquierda));
                     }
                 }
                 cambio_imagen = false;
             }
-            g.drawImage(elefante, x_pos, y_pos, this);
+            g.drawImage(elefante.getImage(), x_pos, y_pos, this);
 
         } else {
             //Da un mensaje mientras se carga el dibujo	
@@ -182,6 +192,7 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
         // Detengo al elefante cuando choca con la pared.
         if (x_pos == (getWidth() - largo_elefante) || x_pos == 0
                 || y_pos == (getHeight() - altura_elefante) || y_pos == 0) {
+            sonido.play();
             velocidad = 0;
             if (!en_colision) {
                 contador_colision = ciclos_de_espera_colision;
@@ -189,9 +200,9 @@ public class AnimacionConImagen extends Applet implements Runnable, KeyListener 
                 en_colision = true;
             } else {
                 contador_colision--;
-                if (contador_colision == 0) {
+                if (contador_colision == -1) {
                     cambio_imagen = true;
-                    en_colision = false; 
+                    en_colision = false;
                     velocidad = 1;
                     invertirDireccion();
                 }
